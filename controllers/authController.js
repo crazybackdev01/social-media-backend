@@ -14,11 +14,6 @@ const registerController = async (req, res, next) => {
     //   bio: "I am student",
     // });
 
-    // @User auth without encrypting password
-    // const newUser = new User(req.body);
-    // const savedUser = await newUser.save();
-    // res.status(500).json(savedUser);
-
     // @User auth with encrypting password
     const { password, username, email } = req.body;
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
