@@ -267,6 +267,10 @@ const generateFileUrl = (filename) => {
 const updateProfilePictureController = async (req, res, next) => {
   const { userId } = req.params;
   const { filename } = req.file;
+  // if multiple files existed then :-
+  // middleware : upload.array('form-fieldname',<array-length>);
+  // to access them in controller :-
+  // use const filenamesArray = req.files.map(file => file.filename);
   try {
     const user = await User.findByIdAndUpdate(
       userId,

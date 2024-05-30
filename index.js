@@ -4,6 +4,7 @@ const connectDB = require("./db/db");
 const cookieParser = require("cookie-parser");
 const authRoute = require("./routes/auth.route.js");
 const userRoute = require("./routes/user.route.js");
+const postRoute = require("./routes/post.routes.js");
 const dotenv = require("dotenv");
 const { errorHandler } = require("./middlewares/error.js");
 const path = require("path");
@@ -17,7 +18,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
-
+app.use("/api/post", postRoute);
 app.use(errorHandler);
 
 app.listen(process.env.PORT, () => {
