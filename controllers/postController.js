@@ -85,23 +85,20 @@ const updatePostController = async (req, res, next) => {
   const { caption } = req.body;
 
   try {
-    const post = await Post.findById(postId);
-    if (!post) {
-      throw new CustomError("Post not found", 400);
-    }
-
-    post.caption = caption || post.caption;
-
-    const updatedPost = await post.save();
+    const updatedPost = await Post.findByIdAndUpdate(
+      postId,
+      { caption },
+      { new: true }
+    );
 
     if (!updatedPost) {
-      throw new CustomError("Internal server Error! Try Again", 500);
+      throw new CustomError("Post not found or Updated", 400);
     }
 
     return res.status(200).json({
       success: true,
       message: "Post updated successfully",
-      post: updatedPost,
+      data: updatedPost,
     });
   } catch (error) {
     next(error);
