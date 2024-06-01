@@ -13,9 +13,9 @@ const path = require("path");
 dotenv.config();
 app.use(express.json());
 app.use(cookieParser());
-// app.use("/uploads",express.static(path.join(__dirname,"uploads")))
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+//Routes handlers for routes
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
 app.use("/api/post", postRoute);
