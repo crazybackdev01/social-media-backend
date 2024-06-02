@@ -174,6 +174,8 @@ const deleteCommentController = async (req, res, next) => {
     post.comments = post.comments.filter(
       (comment) => comment._id.toString() !== commentId
     ); */
+
+    // To Query an Array field for a value: here comments is an array
     const post = await Post.findOneAndUpdate(
       { comments: commentId },
       { $pull: { comments: commentId } },
@@ -218,13 +220,115 @@ const likeCommentController = async (req, res, next) => {
   const { userId } = req.body;
 
   try {
+    let comment = await Comment.findById(commentId);
+    if (!comment) {
+      throw new CustomError("Comment not Exists!", 404);
+    }
+
+    if (comment.likes.includes(userId)) {
+      return res
+        .status(200)
+        .json(new ApiResponse(comment, "You already liked the comment!"));
+    }
+
+    comment.likes.push(userId);
+    await comment.save();
+    return res.status(200).json(new ApiResponse(comment, "Liked the comment!"));
   } catch (error) {
     next(error);
   }
 };
-const dislikeCommentController = async (req, res, next) => {};
-const likeReplyCommentController = async (req, res, next) => {};
-const dislikeReplyCommentController = async (req, res, next) => {};
+
+const dislikeCommentController = async (req, res, next) => {
+  const { commentId } = req.params;
+  const { userId } = req.body;
+  try {
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      throw new CustomError("Comment not found", 404);
+    }
+
+    if (!comment.likes.includes(userId)) {
+      throw new CustomError("You have not liked this comment", 404);
+    }
+
+    comment.likes = comment.likes.filter((id) => id.toString() !== userId);
+    await comment.save();
+    return res
+      .status(200)
+      .json(new ApiResponse(comment, "Successfully disliked the comment"));
+  } catch (error) {
+    next(error);
+  }
+};
+const likeReplyCommentController = async (req, res, next) => {
+  const { commentId, replyId } = req.params;
+  const { userId } = req.body;
+  try {
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      throw new CustomError("Comment not found", 404);
+    }
+
+    /* 
+    MongooseDocumentArray.prototype.id()
+    Parameters:
+    id «ObjectId|String|Number|Buffer»
+    Returns:
+    «EmbeddedDocument,null» the subdocument or null if not found.
+    Searches array items for the first document with a matching _id.
+
+    Example:
+    const embeddedDoc = m.array.id(some_id);
+    */
+    // Using above Method
+    // const replyComment = comment.replies.id(replyId);
+    const replyIndex = comment.replies.findIndex(
+      (reply) => reply._id.toString() === replyId
+    );
+    if (replyIndex === -1) {
+      throw new CustomError("Reply not exists!", 404);
+    }
+
+    if (comment.replies[replyIndex].likes.includes(userId)) {
+      throw new CustomError("Reply already liked!", 404);
+    }
+
+    comment.replies[replyIndex].likes.push(userId);
+    await comment.save();
+    return res.status(200).json(new ApiResponse("You liked this reply!"));
+  } catch (error) {
+    next(error);
+  }
+};
+const dislikeReplyCommentController = async (req, res, next) => {
+  const { commentId, replyId } = req.params;
+  const { userId } = req.body;
+  try {
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      throw new CustomError("Comment not found", 404);
+    }
+    const replyIndex = comment.replies.findIndex(
+      (like) => like._id.toString() === replyId
+    );
+    if (replyIndex === -1) {
+      throw new CustomError("Reply not exists!", 404);
+    }
+
+    if (!comment.replies[replyIndex].likes.includes(userId)) {
+      throw new CustomError("You have not liked this reply yet!", 404);
+    }
+
+    comment.replies.likes = comment.replies.likes.filter(
+      (id) => id.toString() !== userId
+    );
+    await comment.save();
+    return res.status(200).json(new ApiResponse("You disliked this reply!"));
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   createCommentController,
@@ -241,8 +345,6 @@ module.exports = {
 };
 
 /*
-
-
 Remove All Items That Equal a Specified Value
 Create the stores collection:
 
