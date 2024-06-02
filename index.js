@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const authRoute = require("./routes/auth.route.js");
 const userRoute = require("./routes/user.route.js");
 const postRoute = require("./routes/post.routes.js");
+const commentRoute = require("./routes/comment.routes.js");
 const dotenv = require("dotenv");
 const { errorHandler } = require("./middlewares/error.js");
 const path = require("path");
@@ -16,9 +17,10 @@ app.use(cookieParser());
 
 //Routes handlers for routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use("/api/auth", authRoute);
-app.use("/api/user", userRoute);
-app.use("/api/post", postRoute);
+app.use("/api/v1/auth", authRoute);
+app.use("/api/v1/user", userRoute);
+app.use("/api/v1/post", postRoute);
+app.use("/api/v1/comment", commentRoute);
 app.use(errorHandler);
 
 app.listen(process.env.PORT, () => {
