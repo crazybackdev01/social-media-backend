@@ -30,7 +30,7 @@ services:
     # specify environment variables for the api service
     # for demo purposes, we're using a local mongodb instance
     environment: 
-      MONGODB_URL: mongodb+srv://udit:radhe123@social-media.okimv3p.mongodb.net/social?retryWrites=true&w=majority&appName=Social-media
+      MONGODB_URL: 
     
     # establish docker compose watch mode for the api service
     develop:
