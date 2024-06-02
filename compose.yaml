@@ -30,7 +30,7 @@ services:
     # specify environment variables for the api service
     # for demo purposes, we're using a local mongodb instance
     environment: 
-      MONGODB_URL: 
+      MONGODB_URL: ${MONGODB_URL}
     
     # establish docker compose watch mode for the api service
     develop:
