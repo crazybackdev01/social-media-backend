@@ -7,14 +7,46 @@
 # You can add other services your application may depend on here, such as a
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
+
+# specify the version of docker-compose
+version: "3.8"
+
+
 services:
-  server:
-    build:
-      context: .
-    environment:
-      NODE_ENV: production
-    ports:
+  api: 
+    # api service depends on the db service so the db service will be started before the api service
+    depends_on: 
+      - db
+
+    # specify the build context for the api service
+    build: .
+    
+    # specify the ports to expose for the api service
+    # the first number is the port on the host machine
+    # the second number is the port inside the container
+    ports: 
       - 5000:5000
+
+    # specify environment variables for the api service
+    # for demo purposes, we're using a local mongodb instance
+    environment: 
+      MONGODB_URL: mongodb+srv://udit:radhe123@social-media.okimv3p.mongodb.net/social?retryWrites=true&w=majority&appName=Social-media
+    
+    # establish docker compose watch mode for the api service
+    develop:
+      # specify the files to watch for changes
+      watch:
+        # it'll watch for changes in package.json and package-lock.json and rebuild the container and image if there are any changes
+        - path: ./package.json
+          action: rebuild
+        - path: ./package-lock.json
+          action: rebuild
+        
+        # it'll watch for changes in the backend directory and sync the changes with the container real time
+        - path: .
+          target: /app
+          action: sync
+
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to
@@ -49,3 +81,22 @@ services:
 #   db-password:
 #     file: db/password.txt
 
+# version: "3.9"
+# services:
+#     web:
+#         build:
+#             context: .
+#             dockerfile: Dockerfile
+#         ports:
+#             - "3000:3000"
+#         environment:
+#             MONGODB_ATLAS_PUBLIC_API_KEY: YOUR_PUBLIC_KEY_HERE
+#             MONGODB_ATLAS_PRIVATE_API_KEY: YOUR_PRIVATE_KEY_HERE
+#             MONGODB_ATLAS_ORG_ID: YOUR_ORG_ID_HERE
+#             MONGODB_ATLAS_PROJECT_ID: YOUR_PROJECT_ID_HERE
+#             MONGODB_CLUSTER_NAME: examples
+#             MONGODB_USERNAME: demo
+#             MONGODB_PASSWORD: password1234
+#             # MONGODB_DATABASE: sample_mflix
+#             # MONGODB_COLLECTION: movies
+#             CLEANUP_ONDESTROY: true
